@@ -8,7 +8,7 @@ public class PaymentFrequencyTests
     public void Frequency_IsCorrect()
     {
         var monthly = new MonthlyPaymentFrequency();
-        var fortNightly = new FortNightlyPaymentFrequency();
+        var fortNightly = new FortnightlyPaymentFrequency();
 
         Assert.That(monthly.AnnualPaymentFrequencyCount, Is.EqualTo(12));
         Assert.That(fortNightly.AnnualPaymentFrequencyCount, Is.EqualTo(26));
@@ -18,7 +18,7 @@ public class PaymentFrequencyTests
     public void PeriodEndDate_IsCorrect()
     {
         var monthly = new MonthlyPaymentFrequency();
-        var fortNightly = new FortNightlyPaymentFrequency();
+        var fortNightly = new FortnightlyPaymentFrequency();
 
         var x1 = monthly.GetEndDateOfPeriod(1, 2022);
         var x2 = monthly.GetEndDateOfPeriod(3, 2022);
@@ -35,7 +35,7 @@ public class PaymentFrequencyTests
     public void PeriodStartDate_IsCorrect()
     {
         var monthly = new MonthlyPaymentFrequency();
-        var fortNightly = new FortNightlyPaymentFrequency();
+        var fortNightly = new FortnightlyPaymentFrequency();
 
         var x1 = monthly.GetStartDateOfPeriod(1, 2022);
         var x2 = monthly.GetStartDateOfPeriod(3, 2022);

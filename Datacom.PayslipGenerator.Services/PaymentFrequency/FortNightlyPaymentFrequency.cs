@@ -1,8 +1,8 @@
 ﻿namespace Datacom.PayslipGenerator.Services.PaymentFrequency;
 
-public sealed class FortNightlyPaymentFrequency : BasePaymentFrequency
+public sealed class FortnightlyPaymentFrequency : BasePaymentFrequency
 {
-    public FortNightlyPaymentFrequency()
+    public FortnightlyPaymentFrequency()
         : base(26)
     {
     }

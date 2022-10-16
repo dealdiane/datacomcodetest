@@ -35,7 +35,7 @@ public sealed class ConsoleHostedService : IHostedService
         Debug.Assert(payslipB.PeriodStart == new DateOnly(2022, 01, 01));
         Debug.Assert(payslipB.PeriodEnd == new DateOnly(2022, 01, 31));
 
-        var parameterC = new PayslipParameter(120_000, 1, new FortNightlyPaymentFrequency(), 2022, 10);
+        var parameterC = new PayslipParameter(120_000, 1, new FortnightlyPaymentFrequency(), 2022, 10);
         var payslipC = await _payslipGenerator.GeneratePayslipAsync(parameterC);
 
         Debug.Assert(payslipC.GrossIncomeAmount == 4_615.38m);
