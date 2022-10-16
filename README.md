@@ -1,3 +1,4 @@
+
 # DATACOM Code Test
 
 ## Build
@@ -6,7 +7,7 @@
     2. Navigate to the `Datacom.PayslipGenerator.Web\` folder and run `run-dev.cmd`
         * **Note** that running this for the first time will download an open-source runner that I created from NetPotential's BitBucket account. 
             It is a bootstrapper for running .NET Core projects and does not install anything.
-        * Alternatively, set `Datacom.PayslipGenerator.Web` as the startup project, and press F5. (see notes below)
+        * Alternatively, from `Visual Studio 2022` set `Datacom.PayslipGenerator.Web` as the startup project, and press F5. (see notes below)
     3. From a browser, go to https://localhost:7017/ if it did not auto-launch.
 * To run the **console** project:
     1. Select the `Datacom.PayslipGenerator.Console` project and run
@@ -18,7 +19,7 @@
 * Payment period is monthly (Fortnightly has also been implemented but not used)
 * Locale is en-NZ
 * Default rounding is to the nearest number, when a number is halfway
-* Tax bracket is per requirement
+* Default tax bracket is as per requirement
 
 ## Notes
 
