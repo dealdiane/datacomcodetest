@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="1.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Datacom.PayslipGenerator.Services\Datacom.PayslipGenerator.Services.csproj" />
+    </ItemGroup>
+
+    <Target Name="BuildAngular" AfterTargets="Build">
+        <Exec Command="cd clientapp &amp;&amp; npm run build-production" Condition="'$(Configuration)'=='Release'" />
+        <Exec Command="cd clientapp &amp;&amp; npm run build-development" Condition="'$(Configuration)'=='Debug'" />
+    </Target>
+
+</Project>

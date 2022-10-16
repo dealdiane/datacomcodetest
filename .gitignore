@@ -1,0 +1,9 @@
+.ignore
+.vs/
+**/.run/
+*/bin/
+*/obj/
+**/node_modules/
+**/*.user
+Datacom.PayslipGenerator.Web/wwwroot/lib/
+Datacom.PayslipGenerator.Web/wwwroot/app/main.js

@@ -1,0 +1,39 @@
+root = true
+
+[*]
+end_of_line = crlf
+indent_style = spaces
+
+[*.cs]
+# Formatting
+csharp_new_line_before_open_brace = all
+
+# Naming convention
+dotnet_style_qualification_for_field = false:error
+
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+
+# Public constants must be pascal case
+dotnet_naming_style.pascal_case_no_prefix.capitalization = pascal_case
+dotnet_naming_symbols.all_constants.applicable_kinds = field
+dotnet_naming_symbols.all_constants.required_modifiers = const
+dotnet_naming_symbols.all_constants.applicable_accessibilities = *
+
+dotnet_naming_rule.constants_must_be_pascal_case.symbols = all_constants
+dotnet_naming_rule.constants_must_be_pascal_case.severity = error
+dotnet_naming_rule.constants_must_be_pascal_case.style = pascal_case_no_prefix
+
+# Private fields must start with underscore
+dotnet_naming_style.camel_case_prefixed_with_underscore.capitalization = camel_case
+dotnet_naming_style.camel_case_prefixed_with_underscore.required_prefix = _
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_rule.private_fields_camel_case_prefixed_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_camel_case_prefixed_with_underscore.severity = error
+dotnet_naming_rule.private_fields_camel_case_prefixed_with_underscore.style = camel_case_prefixed_with_underscore
+
+

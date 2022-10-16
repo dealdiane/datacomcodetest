@@ -1,0 +1,11 @@
+﻿.text-pre {
+    white-space: pre;
+}
+
+.form-csv {
+    textarea[name="csv"] {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        min-height: 200px;
+    }
+}
