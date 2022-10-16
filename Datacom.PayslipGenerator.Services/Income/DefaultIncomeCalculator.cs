@@ -17,7 +17,7 @@ public sealed class DefaultIncomeCalculator : IIncomeCalculator
 
     public IncomeDetails CalculateIncome(decimal annualSalary, IPaymentFrequency paymentFrequency, int taxYear, decimal superannuationRate)
     {
-        if (paymentFrequency.AnnualPaymentFrequencyCount < 0)
+        if (paymentFrequency.AnnualPaymentFrequencyCount <= 0)
         {
             throw new InvalidOperationException("Invalid payment frequency.");
         }
