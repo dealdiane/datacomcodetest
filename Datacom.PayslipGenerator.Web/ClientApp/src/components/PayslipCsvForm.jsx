@@ -4,7 +4,6 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { readString, jsonToCSV } from "react-papaparse";
 
 export default function PayslipCsvForm({ onGenerated }) {
-
     const [outputCsv, setOutputCsv] = useState('');
 
     const payslipSchema = Yup.object().shape({
@@ -57,6 +56,7 @@ export default function PayslipCsvForm({ onGenerated }) {
 
     const createPayslipParameters = (csv) => {
         const { data, errors: readErrors } = readString(csv, {
+            delimiter: ',',
             skipEmptyLines: false // Skipping empty lines may cause incorrect line number error messages
         });
 
@@ -83,7 +83,7 @@ export default function PayslipCsvForm({ onGenerated }) {
     };
 
     const setCsvOutputFromResponse = async (response) => {
-            // TODO: Handle exception if response format is unexpected
+        // TODO: Handle exception if response format is unexpected
         const payslips = await response.json();
         const payslipRows = payslips.map(payslip => {
             return {
@@ -103,7 +103,7 @@ export default function PayslipCsvForm({ onGenerated }) {
         setOutputCsv(csv);
     }
 
-    const getNormalizedErrorsFromResponse = async function*(response) {
+    const getNormalizedErrorsFromResponse = async function* (response) {
         let serverErrors;
 
         try {
@@ -119,42 +119,48 @@ export default function PayslipCsvForm({ onGenerated }) {
 
             if (nameMatch.length === 3) {
                 const rowNumber = parseInt(nameMatch[1]);
-                yield`Error at line ${rowNumber + 1}: ${errorMessage}`;
+                yield `Error at line ${rowNumber + 1}: ${errorMessage}`;
             } else {
                 yield errorMessage;
             }
         }
     }
 
-    const submitForm = async (values, { setErrors }) => {
-        const { parameters, errors } = createPayslipParameters(values.csv);
+    const submitForm = (values, { setErrors, setSubmitting }) => {
+        !(async () => {
+            const { parameters, errors } = createPayslipParameters(values.csv);
 
-        if (!errors.length) {
-            const rawResponse = await fetch('/api/payslip/generatelist', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(parameters)
-            });
+            try {
+                if (!errors.length) {
+                    const rawResponse = await fetch('/api/payslip/generatelist', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(parameters)
+                    });
 
-            if (rawResponse.ok) {
-                await setCsvOutputFromResponse(rawResponse);
-            } else {
-                const serverErrors = getNormalizedErrorsFromResponse(rawResponse);
+                    if (rawResponse.ok) {
+                        await setCsvOutputFromResponse(rawResponse);
+                    } else {
+                        const serverErrors = getNormalizedErrorsFromResponse(rawResponse);
 
-                for await (const serverError of serverErrors) {
-                    errors.push(serverError);
+                        for await (const serverError of serverErrors) {
+                            errors.push(serverError);
+                        }
+                    }
                 }
-            }
-        }
 
-        if (errors.length) {
-            setErrors({
-                csv: errors.join('\n')
-            });
-        }
+                if (errors.length) {
+                    setErrors({
+                        csv: errors.join('\n')
+                    });
+                }
+            } finally {
+                setSubmitting(false);
+            }
+        })();
     };
 
     return (
@@ -176,16 +182,22 @@ Alex,Wong,120000,10%,March`}
                 validationSchema={payslipSchema}
                 onSubmit={submitForm}
             >
-                <Form className="form-csv">
-                    <div className="mb-3 mt-5">
-                        <label className="form-label" htmlFor="firstName">CSV:</label>
-                        <Field component="textarea" className="form-control" id="csv" name="csv"></Field>
-                        <span className="invalid-feedback text-pre">
-                            <ErrorMessage name="csv" />
-                        </span>
-                    </div>
-                    <button className="btn btn-primary" type="submit">Generate Payslip CSV</button>
-                </Form>
+                {(formik) => (
+                    <Form className="form-csv">
+                        <div className="mb-3 mt-5">
+                            <label className="form-label" htmlFor="firstName">CSV:</label>
+                            <Field component="textarea" className="form-control" id="csv" name="csv"></Field>
+                            <span className="invalid-feedback text-pre">
+                                <ErrorMessage name="csv" />
+                            </span>
+                        </div>
+                        <div>
+                            <button className="btn btn-primary" type="submit" disabled={formik.isSubmitting}>Generate Payslip CSV
+                                {!!formik.isSubmitting && <small className="spinner-border spinner-border-sm ms-2"></small>}
+                            </button>
+                        </div>
+                    </Form>
+                )}
             </Formik>
             {!!outputCsv.length &&
                 <div className="card mt-5">

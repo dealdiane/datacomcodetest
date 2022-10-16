@@ -32,7 +32,7 @@ export default function PayslipForm({ onGenerated }) {
             .max(100, 'Superannuation rate must be a number between 0 and 100.')
     });
 
-    const submitForm = async (values, { setErrors }) => {
+    const submitForm = (values, { setErrors, setSubmitting }) => {
         setServerError('');
 
         const requestValues = { ...values };
@@ -48,36 +48,43 @@ export default function PayslipForm({ onGenerated }) {
             delete requestValues.lastName;
         }
 
-        const rawResponse = await fetch('/api/payslip/generatesingle', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestValues)
-        });
+        !(async () => {
+            try {
+                const rawResponse = await fetch('/api/payslip/generatesingle', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestValues)
+                });
 
-        let jsonResponse;
+                let jsonResponse;
 
-        try {
-            jsonResponse = await rawResponse.json();
-        } catch {
-            setServerError('A server error has occurred. Please try again.');
-        }
+                try {
+                    jsonResponse = await rawResponse.json();
+                } catch {
+                    setServerError('A server error has occurred. Please try again.');
+                }
 
-        if (rawResponse.ok) {
-            onGenerated(jsonResponse);
-        } else {
-            const error = {};
+                if (rawResponse.ok) {
+                    onGenerated(jsonResponse);
+                } else {
+                    const error = {};
 
-            for (const serverPropertyName in jsonResponse) {
-                // Convert property name to camelCase. Assumes that properties are PascalCased
-                const propertyName = serverPropertyName.charAt(0).toLowerCase() + serverPropertyName.slice(1)
-                error[propertyName] = jsonResponse[serverPropertyName].join(';');
+                    for (const serverPropertyName in jsonResponse) {
+                        // Convert property name to camelCase.
+                        // Assumes that server properties are PascalCased.
+                        const propertyName = serverPropertyName.charAt(0).toLowerCase() + serverPropertyName.slice(1)
+                        error[propertyName] = jsonResponse[serverPropertyName].join(';');
+                    }
+
+                    setErrors(error);
+                }
+            } finally {
+                setSubmitting(false);
             }
-
-            setErrors(error);
-        }
+        })();
     };
 
     return (
@@ -92,58 +99,64 @@ export default function PayslipForm({ onGenerated }) {
             validationSchema={payslipSchema}
             onSubmit={submitForm}
         >
-            <Form>
-                {serverError && serverError.length && <div className="invalid-feedback">{serverError}</div>}
-                <div className="mb-3">
-                    <label className="form-label" htmlFor="firstName">First Name:</label>
-                    <Field className="form-control" id="firstName" name="firstName"></Field>
-                    <span className="invalid-feedback">
-                        <ErrorMessage name="firstName" />
-                    </span>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label" htmlFor="lastName">Last Name:</label>
-                    <Field className="form-control" id="lastName" name="lastName"></Field>
-                    <span className="invalid-feedback">
-                        <ErrorMessage name="lastName" />
-                    </span>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label" htmlFor="annualSalary">Annual Salary:</label>
-                    <div className="input-group mb-3">
-                        <span className="input-group-text">$</span>
-                        <Field className="form-control" id="annualSalary" name="annualSalary" type="number"></Field>
+            {(formik) => (
+                <Form>
+                    {serverError && serverError.length && <div className="invalid-feedback">{serverError}</div>}
+                    <div className="mb-3">
+                        <label className="form-label" htmlFor="firstName">First Name:</label>
+                        <Field className="form-control" id="firstName" name="firstName"></Field>
+                        <span className="invalid-feedback">
+                            <ErrorMessage name="firstName" />
+                        </span>
                     </div>
-                    <span className="invalid-feedback">
-                        <ErrorMessage name="annualSalary" />
-                    </span>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label" htmlFor="paymentPeriod">Period:</label>
-                    <Field
-                        className="form-control"
-                        id="paymentPeriod"
-                        name="paymentPeriod"
-                        component="select"
-                    >
-                        <MonthOptions />
-                    </Field>
-                    <span className="invalid-feedback">
-                        <ErrorMessage name="paymentPeriod" />
-                    </span>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label" htmlFor="superannuationRate">Superannuation Rate:</label>
-                    <div className="input-group mb-3">
-                        <Field className="form-control" id="superannuationRate" name="superannuationRate" type="number"></Field>
-                        <span className="input-group-text">%</span>
+                    <div className="mb-3">
+                        <label className="form-label" htmlFor="lastName">Last Name:</label>
+                        <Field className="form-control" id="lastName" name="lastName"></Field>
+                        <span className="invalid-feedback">
+                            <ErrorMessage name="lastName" />
+                        </span>
                     </div>
-                    <span className="invalid-feedback">
-                        <ErrorMessage name="superannuationRate" />
-                    </span>
-                </div>
-                <button className="btn btn-primary" type="submit">Generate Payslip</button>
-            </Form>
+                    <div className="mb-3">
+                        <label className="form-label" htmlFor="annualSalary">Annual Salary:</label>
+                        <div className="input-group mb-3">
+                            <span className="input-group-text">$</span>
+                            <Field className="form-control" id="annualSalary" name="annualSalary" type="number"></Field>
+                        </div>
+                        <span className="invalid-feedback">
+                            <ErrorMessage name="annualSalary" />
+                        </span>
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label" htmlFor="paymentPeriod">Period:</label>
+                        <Field
+                            className="form-control"
+                            id="paymentPeriod"
+                            name="paymentPeriod"
+                            component="select"
+                        >
+                            <MonthOptions />
+                        </Field>
+                        <span className="invalid-feedback">
+                            <ErrorMessage name="paymentPeriod" />
+                        </span>
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label" htmlFor="superannuationRate">Superannuation Rate:</label>
+                        <div className="input-group mb-3">
+                            <Field className="form-control" id="superannuationRate" name="superannuationRate" type="number"></Field>
+                            <span className="input-group-text">%</span>
+                        </div>
+                        <span className="invalid-feedback">
+                            <ErrorMessage name="superannuationRate" />
+                        </span>
+                    </div>
+                    <div>
+                        <button className="btn btn-primary" type="submit" disabled={formik.isSubmitting}>Generate Payslip
+                            {!!formik.isSubmitting && <small className="spinner-border spinner-border-sm ms-2"></small>}
+                        </button>
+                    </div>
+                </Form>
+            )}
 
         </Formik>
     );
