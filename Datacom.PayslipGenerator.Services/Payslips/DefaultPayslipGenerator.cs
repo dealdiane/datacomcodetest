@@ -5,17 +5,10 @@ namespace Datacom.PayslipGenerator.Services.Payslips;
 public sealed class DefaultPayslipGenerator : IPayslipGenerator
 {
     private readonly IIncomeCalculator _incomeCalculator;
-    private readonly IRoundOffStrategy _roundOffStrategy;
-    private readonly ITaxCalculatorFactory _taxCalculatorFactory;
 
-    public DefaultPayslipGenerator(
-        IIncomeCalculator incomeCalculator,
-        IRoundOffStrategy roundOffStrategy,
-        ITaxCalculatorFactory taxCalculatorFactory)
+    public DefaultPayslipGenerator(IIncomeCalculator incomeCalculator)
     {
         _incomeCalculator = incomeCalculator;
-        _roundOffStrategy = roundOffStrategy;
-        _taxCalculatorFactory = taxCalculatorFactory;
     }
 
     public Task<Payslip> GeneratePayslipAsync(PayslipParameter parameter, CancellationToken cancellationToken = default)
